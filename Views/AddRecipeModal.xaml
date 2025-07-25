@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FoodAndDrinkApp.Views.AddRecipeModal">
+
+    <Grid x:Name="AddRecipeModalGrid"
+          BackgroundColor="#00000099"
+          Padding="12">
+
+        <Frame x:Name="AddRecipeForm"
+                    BackgroundColor="White"
+                    CornerRadius="15"
+                    Padding="12"
+                    WidthRequest="{OnPlatform Android=320, WinUI=400}"
+                    HeightRequest="500"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Start">
+
+            <ScrollView VerticalScrollBarVisibility="Always"
+                Margin="0"
+                VerticalOptions="FillAndExpand">
+                
+                <VerticalStackLayout Spacing="15">
+                    <!-- Heading -->
+                    <Label Text="Add New Recipe" 
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           TextColor="Black" />
+
+                    <!-- Recipe Title -->
+                    <Frame Style="{StaticResource ShortInputFrameStyle}">
+                        <Entry x:Name="titleEntry"
+                               Placeholder="Recipe Title"
+                               Style="{StaticResource InputEntryStyle}" />
+                    </Frame>
+
+                    <!-- Estimated Time -->
+                    <Frame Style="{StaticResource ShortInputFrameStyle}">
+                        <Entry x:Name="estimatedTimeEntry"
+                               Placeholder="Estimated Time (e.g. 30 mins)"
+                               Style="{StaticResource InputEntryStyle}" />
+                   </Frame>
+
+                        <!-- Ingredients -->
+                    <Frame Style="{StaticResource LongInputFrameStyle}">
+                        <Editor x:Name="ingredientsEditor"
+                                Placeholder="Ingredients"
+                                HeightRequest="70"
+                                AutoSize="TextChanges"
+                                Style="{StaticResource InputEditorStyle}" />
+                    </Frame>
+
+                    <!-- Instructions -->
+                    <Frame Style="{StaticResource LongInputFrameStyle}">
+                        <Editor x:Name="instructionsEditor"
+                            Placeholder="Instructions"
+                            HeightRequest="70"
+                            AutoSize="TextChanges"
+                            Style="{StaticResource InputEditorStyle}" />
+                    </Frame>
+
+                    <!-- Image Preview + Button -->
+                    <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                        <Image x:Name="recipeImage"
+                               HeightRequest="120"
+                               HorizontalOptions="FillAndExpand"
+                               Aspect="AspectFill"
+                               Margin="0" />
+                        <Button Text="Select Image"
+                                BackgroundColor="LightGreen"
+                                TextColor="Black"
+                                Clicked="OnImagePickClicked" />
+                    </VerticalStackLayout>
+
+                    <Entry x:Name="imagePathEntry"
+                           IsVisible="False" />
+
+                    <!-- Action Buttons -->
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="15">
+                        <Button Text="Cancel"
+                                Clicked="OnCancelAddRecipeClicked"
+                                BackgroundColor="Gray"
+                                TextColor="White" />
+                        <Button Text="Save"
+                                Clicked="OnSaveRecipeClicked"
+                                BackgroundColor="#ff6b6b"
+                                TextColor="White" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+            </Frame>
+        
+    </Grid>
+
+</ContentView>

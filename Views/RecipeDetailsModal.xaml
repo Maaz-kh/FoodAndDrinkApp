@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FoodAndDrinkApp.Views.RecipeDetailsModal">
+    
+    <Grid x:Name="RecipeDetailsModalGrid"
+          BackgroundColor="#00000099"
+          Padding="12">
+
+        <Frame x:Name="detailsWrapper"
+               BackgroundColor="White"
+               CornerRadius="15"
+               Padding="12"
+               WidthRequest="{OnPlatform Android=320, WinUI=400}"
+               HorizontalOptions="Center"
+               VerticalOptions="Center">
+
+            <ScrollView>
+                <VerticalStackLayout Spacing="15">
+
+                    <!-- Recipe Image -->
+                    <Image x:Name="RecipeImage"
+                           HeightRequest="140"
+                           Aspect="AspectFill"
+                           HorizontalOptions="Fill"
+                           Margin="0" />
+
+                    <!-- Title -->
+                    <Label x:Name="TitleLabel"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           TextColor="Black"
+                           HorizontalOptions="Center" />
+
+                    <!-- Estimated Time -->
+                    <Label x:Name="EstimatedTimeLabel"
+                           FontSize="16"
+                           TextColor="Gray"
+                           HorizontalOptions="Center" />
+
+                    <!-- Ingredients -->
+                    <Label Text="Ingredients"
+                           FontAttributes="Bold"
+                           FontSize="18"
+                           TextColor="Black" />
+                    
+                    <Label x:Name="IngredientsLabel"
+                           FontSize="16"
+                           TextColor="Black"
+                           LineBreakMode="WordWrap" />
+
+                    <!-- Instructions -->
+                    <Label Text="Instructions"
+                           FontAttributes="Bold"
+                           FontSize="18"
+                           TextColor="Black" />
+                    <Label x:Name="InstructionsLabel"
+                           FontSize="16"
+                           TextColor="Black"
+                           LineBreakMode="WordWrap" />
+
+                    <!-- Buttons -->
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="15">
+                        <Button Text="Close"
+                                Clicked="OnCloseClicked"
+                                BackgroundColor="Gray"
+                                TextColor="White" />
+                        <Button Text="Edit"
+                                Clicked="OnEditClicked"
+                                BackgroundColor="Orange"
+                                TextColor="White" />
+                        <Button Text="Delete"
+                                Clicked="OnDeleteClicked"
+                                BackgroundColor="Red"
+                                TextColor="White" />
+                    </HorizontalStackLayout>
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </Frame>
+    </Grid>
+</ContentView>
