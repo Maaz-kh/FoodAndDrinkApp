@@ -24,7 +24,7 @@ namespace FoodAndDrinkApp
             builder.Logging.AddDebug();
 #endif
 
-            // 🔗 Define database path
+            // Define database path
             string dbPath = Path.Combine(FileSystem.AppDataDirectory, "recipes.db");
 
             return builder.Build();

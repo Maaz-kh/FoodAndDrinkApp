@@ -11,7 +11,8 @@
                BackgroundColor="White"
                CornerRadius="15"
                Padding="12"
-               WidthRequest="{OnPlatform Android=320, WinUI=400}"
+               WidthRequest="{OnPlatform Android=300, WinUI=400}"
+               HeightRequest="{OnPlatform Android=400, WinUI=550}"
                HorizontalOptions="Center"
                VerticalOptions="Center">
 
@@ -20,7 +21,7 @@
 
                     <!-- Recipe Image -->
                     <Image x:Name="RecipeImage"
-                           HeightRequest="140"
+                           HeightRequest="{OnPlatform Android=200, WinUI=280}"
                            Aspect="AspectFill"
                            HorizontalOptions="Fill"
                            Margin="0" />
@@ -60,18 +61,18 @@
                            LineBreakMode="WordWrap" />
 
                     <!-- Buttons -->
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="15">
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="15" Margin="0,5">
                         <Button Text="Close"
                                 Clicked="OnCloseClicked"
                                 BackgroundColor="Gray"
                                 TextColor="White" />
                         <Button Text="Edit"
                                 Clicked="OnEditClicked"
-                                BackgroundColor="Orange"
+                                BackgroundColor="#4CAF50"
                                 TextColor="White" />
                         <Button Text="Delete"
                                 Clicked="OnDeleteClicked"
-                                BackgroundColor="Red"
+                                BackgroundColor="#dc3545"
                                 TextColor="White" />
                     </HorizontalStackLayout>
 

@@ -9,6 +9,7 @@ public partial class EditRecipeModal : ContentView
     private Recipe _editingRecipe;
 
     public event EventHandler RecipeEdited;
+    public event EventHandler EditiCanceled;
 
     public EditRecipeModal()
 	{
@@ -18,6 +19,7 @@ public partial class EditRecipeModal : ContentView
     }
     public async Task ShowAsync()
     {
+        EditPreviewPlaceholderLabel.IsVisible = true;
         this.IsVisible = true;
         await this.FadeTo(1, 200);
         await EditformWrapper.TranslateTo(0, (this.Height / 2) - 250, 600, Easing.CubicOut);
@@ -37,6 +39,8 @@ public partial class EditRecipeModal : ContentView
         EditIngredientsEditor.Text = recipe.Ingredients;
         EditInstructionsEditor.Text = recipe.Instructions;
         EditRecipeImage.Source = recipe.ImagePath;
+        EditRecipeImage.Opacity = 1;
+        EditPreviewPlaceholderLabel.IsVisible = false;
     }
 
     public Recipe GetEditedRecipe()
@@ -51,7 +55,9 @@ public partial class EditRecipeModal : ContentView
             EstimatedTime = EditEstimatedTimeEntry.Text,
             Ingredients = EditIngredientsEditor.Text,
             Instructions = EditInstructionsEditor.Text,
-            ImagePath = EditImagePathEntry.Text
+            ImagePath = string.IsNullOrWhiteSpace(EditImagePathEntry.Text)
+                    ? _editingRecipe.ImagePath
+                    : EditImagePathEntry.Text
         };
     }
 
@@ -69,21 +75,31 @@ public partial class EditRecipeModal : ContentView
             {
                 EditImagePathEntry.Text = result.FullPath;
                 EditRecipeImage.Source = ImageSource.FromFile(result.FullPath);
+                EditRecipeImage.Opacity = 1;
+                EditPreviewPlaceholderLabel.IsVisible = false;
             }
         }
         catch (Exception ex)
         {
-            await Application.Current.MainPage.DisplayAlert("Error", $"Image selection failed: {ex.Message}", "OK");
+            await MyCustomAlert.Show("Error", $"Image selection failed: {ex.Message}", 0);
         }
     }
     private async void OnCancelEditRecipeClicked(object sender, EventArgs e)
     {
-        await HideAsync();
+        EditiCanceled?.Invoke(this, EventArgs.Empty);
     }
 
     private async void OnEditRecipeClicked(object sender, EventArgs e)
     {
         var updatedRecipe = GetEditedRecipe();
+
+        if (string.IsNullOrWhiteSpace(updatedRecipe.Title))
+        {
+            ShowDimBackground();
+            await MyCustomAlert.Show("Error", "Title is required.", 0);
+            HideDimBackground();
+            return;
+        }
 
         if (updatedRecipe != null)
         {
@@ -91,5 +107,13 @@ public partial class EditRecipeModal : ContentView
             RecipeEdited?.Invoke(this, EventArgs.Empty);
             await HideAsync();
         }
+    }
+    public void ShowDimBackground()
+    {
+        DimBackground.IsVisible = true;
+    }
+    public void HideDimBackground()
+    {
+        DimBackground.IsVisible = false;
     }
 }

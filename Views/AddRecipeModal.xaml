@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:FoodAndDrinkApp.Views"
              x:Class="FoodAndDrinkApp.Views.AddRecipeModal">
 
     <Grid x:Name="AddRecipeModalGrid"
@@ -10,17 +11,22 @@
         <Frame x:Name="AddRecipeForm"
                     BackgroundColor="White"
                     CornerRadius="15"
-                    Padding="12"
-                    WidthRequest="{OnPlatform Android=320, WinUI=400}"
+                    Padding="0"
+                    WidthRequest="{OnPlatform Android=300, WinUI=380}"
                     HeightRequest="500"
                     HorizontalOptions="Center"
-                    VerticalOptions="Start">
+                    VerticalOptions="Start"
+                    ZIndex="1">
+            <Grid>
 
-            <ScrollView VerticalScrollBarVisibility="Always"
-                Margin="0"
-                VerticalOptions="FillAndExpand">
-                
-                <VerticalStackLayout Spacing="15">
+                <BoxView x:Name="DimBackground" BackgroundColor="Black" Opacity="0.4" IsVisible="False" InputTransparent="False" ZIndex="10" CornerRadius="15"/>
+
+                <ScrollView VerticalScrollBarVisibility="Always"
+                    Margin="0"
+                    VerticalOptions="FillAndExpand" ZIndex="1"
+                    Padding="14,16,14,16">
+
+                    <VerticalStackLayout Spacing="15" ZIndex="1">
                     <!-- Heading -->
                     <Label Text="Add New Recipe" 
                            FontSize="20"
@@ -40,9 +46,9 @@
                         <Entry x:Name="estimatedTimeEntry"
                                Placeholder="Estimated Time (e.g. 30 mins)"
                                Style="{StaticResource InputEntryStyle}" />
-                   </Frame>
+                    </Frame>
 
-                        <!-- Ingredients -->
+                    <!-- Ingredients -->
                     <Frame Style="{StaticResource LongInputFrameStyle}">
                         <Editor x:Name="ingredientsEditor"
                                 Placeholder="Ingredients"
@@ -62,16 +68,39 @@
 
                     <!-- Image Preview + Button -->
                     <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
-                        <Image x:Name="recipeImage"
-                               HeightRequest="120"
-                               HorizontalOptions="FillAndExpand"
-                               Aspect="AspectFill"
-                               Margin="0" />
-                        <Button Text="Select Image"
-                                BackgroundColor="LightGreen"
-                                TextColor="Black"
-                                Clicked="OnImagePickClicked" />
-                    </VerticalStackLayout>
+                            <Frame BackgroundColor="Transparent"
+                                   CornerRadius="10"
+                                   Padding="10"
+                                   HasShadow="False"
+                                   HeightRequest="150"
+                                   WidthRequest="{OnPlatform Android=260, WinUI=300}"
+                                   HorizontalOptions="Center"
+                                   BorderColor="#ccc">  
+                                
+                                <Grid>
+                                    <!-- Centered Preview Label -->
+                                    <Label Text="Preview Image"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           TextColor="Gray"
+                                           x:Name="previewPlaceholderLabel" />
+
+                                    <!-- Actual Image (on top of label, initially hidden or transparent) -->
+                                    <Image x:Name="recipeImage"
+                                           HeightRequest="120"
+                                           HorizontalOptions="FillAndExpand"
+                                           Aspect="AspectFit"
+                                           Margin="0"
+                                           Opacity="0" />   
+                                </Grid>
+                            </Frame>
+
+                            <!-- Select Image Button -->
+                            <Button Text="Select Image"
+                                    BackgroundColor="#3F51B5"
+                                    TextColor="White"
+                                    Clicked="OnImagePickClicked" />
+                        </VerticalStackLayout>
 
                     <Entry x:Name="imagePathEntry"
                            IsVisible="False" />
@@ -84,13 +113,16 @@
                                 TextColor="White" />
                         <Button Text="Save"
                                 Clicked="OnSaveRecipeClicked"
-                                BackgroundColor="#ff6b6b"
+                                BackgroundColor="#4CAF50"
                                 TextColor="White" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
+                
             </ScrollView>
-            </Frame>
-        
+            </Grid>
+        </Frame>
+      
+        <local:CustomAlert x:Name="MyCustomAlert" Grid.RowSpan="2" ZIndex="25"/>
     </Grid>
 
 </ContentView>

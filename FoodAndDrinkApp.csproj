@@ -64,12 +64,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Resources\Images\" />
 	  <Folder Include="ViewModels\" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <MauiXaml Update="Views\AddRecipeModal.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\CustomAlert.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\EditRecipeModal.xaml">

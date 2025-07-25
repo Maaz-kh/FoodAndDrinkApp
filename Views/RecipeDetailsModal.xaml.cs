@@ -1,6 +1,7 @@
 // RecipeDetailsModal.xaml.cs
-
+using FoodAndDrinkApp.Services;
 using FoodAndDrinkApp.Models;
+using System.Threading.Tasks;
 namespace FoodAndDrinkApp.Views;
 
 public partial class RecipeDetailsModal : ContentView
@@ -65,9 +66,19 @@ public partial class RecipeDetailsModal : ContentView
         EditRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    private void OnDeleteClicked(object sender, EventArgs e)
+    private async void OnDeleteClicked(object sender, EventArgs e)
     {
-        DeleteRequested?.Invoke(this, EventArgs.Empty);
+        await DeleteRecipeAsync();
+    }
+    private async Task DeleteRecipeAsync()
+    {
+
+        if (_recipe != null)
+        {
+            await DatabaseService.DeleteRecipeAsync(_recipe);    // Delete the recipe from the database
+            await HideAsync();    // Hide the Modal after deletion
+            DeleteRequested?.Invoke(this, EventArgs.Empty);  // Notify parent about the deletion
+        }
     }
 
     public Recipe GetRecipe()

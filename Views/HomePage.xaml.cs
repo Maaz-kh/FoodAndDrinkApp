@@ -5,6 +5,8 @@ using Microsoft.Maui.Controls;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
 
 namespace FoodAndDrinkApp.Views
 {
@@ -22,26 +24,48 @@ namespace FoodAndDrinkApp.Views
 
         private void InitializeEventHandlers()
         {
-            AddModal.CancelRequested += async (_, __) => await AddModal.HideAsync();
-            AddModal.SaveRequested += async (_, __) => await LoadRecipesAsync();
+            AddModal.CancelRequested += async (_, __) => {
+                await AddModal.HideAsync();
+                HideDimBackground();  // Hide dim on cancel
+            };
 
-            DetailsModal.CloseRequested += async (_, __) => await DetailsModal.HideAsync();
-            DetailsModal.DeleteRequested += async (_, __) => await DeleteRecipeAsync();
+            AddModal.SaveRequested += async (_, __) => {
+                await LoadRecipesAsync();
+                ShowDimBackground();
+                await MyCustomAlert.Show("Success", "Recipe Added successfully", 0);
+                HideDimBackground();  // Hide dim on Save
+            };
+
+            DetailsModal.CloseRequested += async (_, __) => {
+                await DetailsModal.HideAsync();
+                HideDimBackground();
+
+            };
+            DetailsModal.DeleteRequested += async (_, __) => {
+                await LoadRecipesAsync();
+                ShowDimBackground();
+                await MyCustomAlert.Show("Success", "Recipe deleted successfully", 0);
+                HideDimBackground();
+            };
+
             DetailsModal.EditRequested += (_, __) => EditRecipeDetails();
 
-            EditRecipeModal.RecipeEdited += async (_, __) => { await LoadRecipesAsync(); };
+            EditRecipeModal.RecipeEdited += async (_, __) => { 
+                await LoadRecipesAsync();
+                ShowDimBackground();
+                await MyCustomAlert.Show("Success", "Recipe Edited successfully", 0);
+                HideDimBackground();
+            };
+
+            EditRecipeModal.EditiCanceled += async(_, __) => {
+                await EditRecipeModal.HideAsync();
+                HideDimBackground();  // Hide dim on cancel
+            };
         }
 
-        private async Task DeleteRecipeAsync()
+        private void EditRecipeModal_EditiCanceled(object? sender, EventArgs e)
         {
-            var recipeToDelete = DetailsModal.GetRecipe(); 
-            
-            if (recipeToDelete != null)
-            {
-                await DatabaseService.DeleteRecipeAsync(recipeToDelete);
-                await LoadRecipesAsync();
-                await DetailsModal.HideAsync();
-            }
+            throw new NotImplementedException();
         }
 
         private async Task LoadRecipesAsync()
@@ -89,14 +113,14 @@ namespace FoodAndDrinkApp.Views
             {
                 Source = recipe.ImagePath,
                 Aspect = Aspect.AspectFill,
-                HeightRequest = 200,
-                WidthRequest = 280
+                HeightRequest = 230,
+                WidthRequest = 300
             };
 
             var titleLabel = new Label
             {
                 Text = recipe.Title,
-                FontSize = 18,
+                FontSize = 20,
                 FontAttributes = FontAttributes.Bold,
                 TextColor = Colors.Black,
                 LineBreakMode = LineBreakMode.TailTruncation
@@ -105,8 +129,10 @@ namespace FoodAndDrinkApp.Views
             var timeLabel = new Label
             {
                 Text = $"Estimated Time: {recipe.EstimatedTime}",
-                FontSize = 14,
-                TextColor = Colors.Gray
+                FontSize = 16,
+                TextColor = Colors.Gray,
+                Margin = new Thickness(0, 0, 0, 10) 
+
             };
 
             var textLayout = new VerticalStackLayout
@@ -129,7 +155,10 @@ namespace FoodAndDrinkApp.Views
                 Margin = new Thickness(10, 5),
                 BackgroundColor = Colors.White,
                 HasShadow = true,
+                WidthRequest = DeviceInfo.Platform == DevicePlatform.Android ? 250 : 300,
+                HeightRequest = DeviceInfo.Platform == DevicePlatform.Android ? 250 : 310,
                 Content = outerLayout,
+                
                 GestureRecognizers =
                 {
                     new TapGestureRecognizer
@@ -137,6 +166,7 @@ namespace FoodAndDrinkApp.Views
                         Command = new Command(async () =>
                         {
                             DetailsModal.LoadRecipe(recipe);
+                            ShowDimBackground();
                             await DetailsModal.ShowAsync();
                         })
                     }
@@ -150,6 +180,7 @@ namespace FoodAndDrinkApp.Views
         // Show the Add Recipe modal when the button is clicked
         private async void OnAddRecipeClicked(object sender, EventArgs e)
         {
+            ShowDimBackground();
             await AddModal.ShowAsync();
         }
 
@@ -165,6 +196,16 @@ namespace FoodAndDrinkApp.Views
                 await DetailsModal.HideAsync();
                 await EditRecipeModal.ShowAsync();
             }
+        }
+
+        public void ShowDimBackground()
+        {
+            DimBackground.IsVisible = true;
+        }
+
+        public void HideDimBackground()
+        {
+            DimBackground.IsVisible = false;
         }
 
     }
