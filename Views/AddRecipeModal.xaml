@@ -96,22 +96,32 @@
                             </Frame>
 
                             <!-- Select Image Button -->
-                            <Button Text="Select Image"
+                            <Button x:Name="SelectImgBtn"
+                                    Text="Select Image"
                                     BackgroundColor="#3F51B5"
                                     TextColor="White"
                                     Clicked="OnImagePickClicked" />
+                            <Button x:Name="CaptureImgBtn"
+                                    Text="Capture Image"
+                                    BackgroundColor="#009688"
+                                    TextColor="White"
+                                    Clicked="OnCaptureImageClicked"
+                                    IsVisible="{OnPlatform Android=true, iOS=true, WinUI=false}" /> 
                         </VerticalStackLayout>
+                        
 
                     <Entry x:Name="imagePathEntry"
                            IsVisible="False" />
 
                     <!-- Action Buttons -->
                     <HorizontalStackLayout HorizontalOptions="Center" Spacing="15">
-                        <Button Text="Cancel"
+                            <Button x:Name="CancelAddBtn"
+                                Text="Cancel"
                                 Clicked="OnCancelAddRecipeClicked"
                                 BackgroundColor="Gray"
                                 TextColor="White" />
-                        <Button Text="Save"
+                            <Button x:Name="SaveAddBtn"
+                                Text="Save"
                                 Clicked="OnSaveRecipeClicked"
                                 BackgroundColor="#4CAF50"
                                 TextColor="White" />

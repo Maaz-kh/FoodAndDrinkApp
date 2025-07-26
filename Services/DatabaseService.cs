@@ -23,7 +23,7 @@ namespace FoodAndDrinkApp.Services
             await _database.CreateTableAsync<Recipe>();    // Create the Recipe table if it doesn't exist
         }
 
-        
+
         public static async Task<List<Recipe>> GetRecipesAsync()
         {
             await InitAsync();     // Ensure the database is initialized
@@ -54,12 +54,6 @@ namespace FoodAndDrinkApp.Services
                 existing.ImagePath = recipe.ImagePath;
                 await _database.UpdateAsync(existing);
             }
-        }
-
-        public static async Task<bool> RecipeExistsAsync(int id)
-        {
-            var recipe = await _database.Table<Recipe>().Where(r => r.Id == id).FirstOrDefaultAsync();
-            return recipe != null;
         }
     }
 }

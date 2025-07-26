@@ -1,7 +1,6 @@
 // RecipeDetailsModal.xaml.cs
 using FoodAndDrinkApp.Services;
 using FoodAndDrinkApp.Models;
-using System.Threading.Tasks;
 namespace FoodAndDrinkApp.Views;
 
 public partial class RecipeDetailsModal : ContentView
@@ -26,7 +25,7 @@ public partial class RecipeDetailsModal : ContentView
         _recipe = recipe;
         BindRecipeData();
     }
-
+    // Binds the recipe data to the UI elements
     private void BindRecipeData()
     {
         TitleLabel.Text = _recipe.Title;
@@ -35,6 +34,7 @@ public partial class RecipeDetailsModal : ContentView
         InstructionsLabel.Text = _recipe.Instructions;
         RecipeImage.Source = _recipe.ImagePath; 
     }
+    // Shows the modal with an animation
     public async Task ShowAsync()
     {
         this.IsVisible = true;
@@ -46,7 +46,7 @@ public partial class RecipeDetailsModal : ContentView
             this.TranslateTo(0, 0, 250, Easing.CubicOut)
         );
     }
-
+    // Hides the modal with an animation
     public async Task HideAsync()
     {
         await Task.WhenAll(
@@ -56,20 +56,29 @@ public partial class RecipeDetailsModal : ContentView
         this.IsVisible = false;
     }
 
-    private void OnCloseClicked(object sender, EventArgs e)
+    // Event handlers for button clicks with animations
+    private async void OnCloseClicked(object sender, EventArgs e)
     {
+        await CancelDetailsBtn.ScaleTo(0.90, 60, Easing.CubicOut);
+        await CancelDetailsBtn.ScaleTo(1, 100, Easing.CubicIn);
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    private void OnEditClicked(object sender, EventArgs e)
+    // Event handlers for button clicks with animations
+    private async void OnEditClicked(object sender, EventArgs e)
     {
+        await EditBtn.ScaleTo(0.90, 60, Easing.CubicOut);
+        await EditBtn.ScaleTo(1, 100, Easing.CubicIn);
         EditRequested?.Invoke(this, EventArgs.Empty);
     }
 
     private async void OnDeleteClicked(object sender, EventArgs e)
     {
+        await DeleteBtn.ScaleTo(0.90, 60, Easing.CubicOut);
+        await DeleteBtn.ScaleTo(1, 100, Easing.CubicIn);
         await DeleteRecipeAsync();
     }
+    // Deletes the recipe from the database and hides the modal
     private async Task DeleteRecipeAsync()
     {
 

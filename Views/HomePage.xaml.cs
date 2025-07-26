@@ -1,12 +1,8 @@
 // HomePage.xaml.cs
 using FoodAndDrinkApp.Models;
 using FoodAndDrinkApp.Services;
-using Microsoft.Maui.Controls;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Core;
+using FoodAndDrinkApp.Utilities;
+
 
 namespace FoodAndDrinkApp.Views
 {
@@ -63,24 +59,22 @@ namespace FoodAndDrinkApp.Views
             };
         }
 
-        private void EditRecipeModal_EditiCanceled(object? sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
+        // Load recipes from the database asynchronously
         private async Task LoadRecipesAsync()
         {
             recipeList = await DatabaseService.GetRecipesAsync();
-            PopulateRecipeGrid(recipeList);
+            PopulateRecipeGrid(recipeList, this.Width);
         }
 
-        private void PopulateRecipeGrid(List<Recipe> recipes)
+        // Populate the grid with recipe cards based on the loaded recipes
+        private void PopulateRecipeGrid(List<Recipe> recipes, double width = 0)
         {
             RecipesGrid.Children.Clear();
             RecipesGrid.ColumnDefinitions.Clear();
             RecipesGrid.RowDefinitions.Clear();
 
-            int columnCount = DeviceDisplay.MainDisplayInfo.Width > 720 ? 3 : 1;
+            int columnCount = width > 900 ? 3 : width > 500 ? 2 : 1;
+
 
             for (int i = 0; i < columnCount; i++)
                 RecipesGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
@@ -106,15 +100,28 @@ namespace FoodAndDrinkApp.Views
                 column++;
             }
         }
+        // Override OnSizeAllocated to adjust the grid layout when the page size changes
+        protected override async void OnSizeAllocated(double width, double height)
+        {
+            base.OnSizeAllocated(width, height);
 
+            if (width > 0 && recipeList.Count > 0)
+            {
+                PopulateRecipeGrid(recipeList, width);
+            }
+        }
+
+        // Create a recipe card view for each recipe
         private View CreateRecipeCard(Recipe recipe)
         {
+            var isAndroid = DeviceInfo.Platform == DevicePlatform.Android;
+
             var image = new Image
             {
                 Source = recipe.ImagePath,
                 Aspect = Aspect.AspectFill,
-                HeightRequest = 230,
-                WidthRequest = 300
+                WidthRequest = isAndroid ? 250 : 300,
+                HeightRequest = isAndroid ? 200 : 240
             };
 
             var titleLabel = new Label
@@ -123,7 +130,9 @@ namespace FoodAndDrinkApp.Views
                 FontSize = 20,
                 FontAttributes = FontAttributes.Bold,
                 TextColor = Colors.Black,
-                LineBreakMode = LineBreakMode.TailTruncation
+                LineBreakMode = LineBreakMode.TailTruncation,
+                HorizontalTextAlignment = isAndroid ? TextAlignment.Center : TextAlignment.Start,
+                Margin = isAndroid ? new Thickness(0, 0, 0, 0) : new Thickness(0)
             };
 
             var timeLabel = new Label
@@ -131,14 +140,15 @@ namespace FoodAndDrinkApp.Views
                 Text = $"Estimated Time: {recipe.EstimatedTime}",
                 FontSize = 16,
                 TextColor = Colors.Gray,
-                Margin = new Thickness(0, 0, 0, 10) 
+                Margin = isAndroid ? new Thickness(0, 0, 0, 5) : new Thickness(0, 0, 0, 10),
+                HorizontalTextAlignment = isAndroid ? TextAlignment.Center : TextAlignment.Start
 
             };
 
             var textLayout = new VerticalStackLayout
             {
                 Padding = new Thickness(15, 15, 15, 15),
-                Spacing = 5,
+                Spacing = isAndroid ? 3 : 5,
                 Children = { titleLabel, timeLabel }
             };
 
@@ -155,35 +165,43 @@ namespace FoodAndDrinkApp.Views
                 Margin = new Thickness(10, 5),
                 BackgroundColor = Colors.White,
                 HasShadow = true,
-                WidthRequest = DeviceInfo.Platform == DevicePlatform.Android ? 250 : 300,
-                HeightRequest = DeviceInfo.Platform == DevicePlatform.Android ? 250 : 310,
+                WidthRequest = isAndroid ? 250 : 300,
+                HeightRequest = isAndroid ? 280 : 320,
                 Content = outerLayout,
-                
-                GestureRecognizers =
-                {
-                    new TapGestureRecognizer
-                    {
-                        Command = new Command(async () =>
-                        {
-                            DetailsModal.LoadRecipe(recipe);
-                            ShowDimBackground();
-                            await DetailsModal.ShowAsync();
-                        })
-                    }
-                }
-                    };
+            };
 
-                    return frame;
+            frame.GestureRecognizers.Add(
+                new TapGestureRecognizer
+                {
+                    Command = new Command(async () =>
+                    {
+                        // tap animation
+                        await frame.ScaleTo(0.95, 50, Easing.CubicOut);
+                        await frame.ScaleTo(1, 100, Easing.CubicIn);
+
+                        // Show modal
+                        DetailsModal.LoadRecipe(recipe);
+                        ShowDimBackground();
+                        await DetailsModal.ShowAsync();
+                    })
                 }
+            );
+
+            return frame;
+        }
 
 
         // Show the Add Recipe modal when the button is clicked
         private async void OnAddRecipeClicked(object sender, EventArgs e)
         {
+            await AddButton.ScaleTo(0.90, 60, Easing.CubicOut);
+            await AddButton.ScaleTo(1, 100, Easing.CubicIn);
+            Helper.SaveVibrationAndHapticFeedback();
             ShowDimBackground();
             await AddModal.ShowAsync();
         }
 
+        // Edit recipe details when the edit button is clicked in the details modal
         private async void EditRecipeDetails()
         {
             var recipeToEdit = DetailsModal.GetRecipe();

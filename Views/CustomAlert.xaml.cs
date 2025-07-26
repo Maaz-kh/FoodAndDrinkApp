@@ -1,5 +1,3 @@
-using System;
-using Microsoft.Maui.Controls;
 
 namespace FoodAndDrinkApp.Views
 {
@@ -13,7 +11,7 @@ namespace FoodAndDrinkApp.Views
             this.IsVisible = false;
             this.Opacity = 0;
         }
-
+        // Function to show the alert with title, message, and optional duration
         public async Task Show(string title, string message, int durationSeconds = 0)
         {
             if (title.Contains("Added") || title.Contains("Success"))
@@ -47,6 +45,8 @@ namespace FoodAndDrinkApp.Views
                 // Wait for user to press OK
                 _tcs = new TaskCompletionSource<bool>();
                 await _tcs.Task; // Pause until OK is pressed
+                await OkBtn.ScaleTo(0.90, 60, Easing.CubicOut);
+                await OkBtn.ScaleTo(1, 100, Easing.CubicIn);
                 await HideAsync();
             }
         }

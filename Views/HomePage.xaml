@@ -22,7 +22,8 @@
                        Margin="20,5,0,5"
                        />
 
-                <Button Text="+ Add"
+                <Button x:Name="AddButton"
+                        Text="+ Add"
                         Clicked="OnAddRecipeClicked"
                         BackgroundColor="#4CAF50"
                         TextColor="White"

@@ -1,10 +1,5 @@
-using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Core;
 using FoodAndDrinkApp.Models;
 using FoodAndDrinkApp.Services;
-using Microsoft.Maui.Controls;
-using System;
-using System.Threading.Tasks;
 
 namespace FoodAndDrinkApp.Views
 {
@@ -20,7 +15,8 @@ namespace FoodAndDrinkApp.Views
             this.IsVisible = false;
             this.Opacity = 0;
         }
-        
+
+        // Function to show the modal
         public async Task ShowAsync()
         {
             previewPlaceholderLabel.IsVisible = true;
@@ -29,6 +25,7 @@ namespace FoodAndDrinkApp.Views
             await AddRecipeForm.TranslateTo(0, (this.Height / 2) - 250, 300, Easing.CubicOut);
         }
 
+        // Function to hide the modal
         public async Task HideAsync()
         {
             previewPlaceholderLabel.IsVisible = false;
@@ -37,6 +34,7 @@ namespace FoodAndDrinkApp.Views
             this.IsVisible = false;
         }
 
+        // Function to get the recipe data from the form
         public Recipe GetRecipe()
         {
             return new Recipe
@@ -50,6 +48,8 @@ namespace FoodAndDrinkApp.Views
                     : imagePathEntry.Text
             };
         }
+
+        // Function to reset the form fields
         public void Reset()
         {
             titleEntry.Text = estimatedTimeEntry.Text = "";
@@ -59,26 +59,56 @@ namespace FoodAndDrinkApp.Views
             previewPlaceholderLabel.IsVisible = true;
         }
 
-
-        private void OnCancelAddRecipeClicked(object sender, EventArgs e)
+        // Event handlers for button clicks
+        private async void OnCancelAddRecipeClicked(object sender, EventArgs e)
         {
+            await CancelAddBtn.ScaleTo(0.90, 60, Easing.CubicOut);
+            await CancelAddBtn.ScaleTo(1, 100, Easing.CubicIn);
             Reset();
             CancelRequested?.Invoke(this, EventArgs.Empty);
         }
 
+        // Event handler for the save button click
         private async void OnSaveRecipeClicked(object sender, EventArgs e)
         {
+            await SaveAddBtn.ScaleTo(0.90, 60, Easing.CubicOut);
+            await SaveAddBtn.ScaleTo(1, 100, Easing.CubicIn);
+
             try
             {
                 var newRecipe = GetRecipe();
 
-                if (string.IsNullOrWhiteSpace(newRecipe.Title))
+                // Trim inputs before checking
+                string title = newRecipe.Title?.Trim() ?? "";
+                string ingredients = newRecipe.Ingredients?.Trim() ?? "";
+                string instructions = newRecipe.Instructions?.Trim() ?? "";
+                string estimatedTime = newRecipe.EstimatedTime?.Trim() ?? "";
+
+                if (title == "" || ingredients == "" || instructions == "" || estimatedTime == "")
                 {
                     ShowDimBackground();
-                    await MyCustomAlert.Show("Error", "Title is required.", 0);
+
+                    string missingFields = "";
+                    if (title == "") missingFields += "Title, ";
+                    if (ingredients == "") missingFields += "Ingredients, ";
+                    if (instructions == "") missingFields += "Instructions, ";
+                    if (estimatedTime == "") missingFields += "Estimated Time, ";
+
+                    // Remove trailing comma and space
+                    if (missingFields.EndsWith(", "))
+                        missingFields = missingFields[..^2]; // C# 8+ range operator
+
+                    await MyCustomAlert.Show("Error", $"{missingFields} cannot be empty.", 0);
+
                     HideDimBackground();
                     return;
                 }
+
+                // Assign trimmed values back if needed
+                newRecipe.Title = title;
+                newRecipe.Ingredients = ingredients;
+                newRecipe.Instructions = instructions;
+                newRecipe.EstimatedTime = estimatedTime;
 
                 await DatabaseService.AddRecipeAsync(newRecipe);
                 SaveRequested?.Invoke(this, EventArgs.Empty); // Parent refreshes
@@ -92,8 +122,11 @@ namespace FoodAndDrinkApp.Views
             }
         }
 
+        // Event handlers for image selection and capture
         private async void OnImagePickClicked(object sender, EventArgs e)
         {
+            await SelectImgBtn.ScaleTo(0.90, 60, Easing.CubicOut);
+            await SelectImgBtn.ScaleTo(1, 100, Easing.CubicIn);
             try
             {
                 var result = await FilePicker.Default.PickAsync(new PickOptions
@@ -114,6 +147,46 @@ namespace FoodAndDrinkApp.Views
             {
                 ShowDimBackground();
                 await MyCustomAlert.Show("Error", $"Image selection failed: {ex.Message}", 0);
+            }
+        }
+        // Event handler for capturing an image using the camera
+        private async void OnCaptureImageClicked(object sender, EventArgs e)
+        {
+            await CaptureImgBtn.ScaleTo(0.90, 60, Easing.CubicOut);
+            await CaptureImgBtn.ScaleTo(1, 100, Easing.CubicIn);
+
+            try
+            {
+                if (MediaPicker.Default.IsCaptureSupported)
+                {
+                    var photo = await MediaPicker.Default.CapturePhotoAsync();
+
+                    if (photo != null)
+                    {
+                        var stream = await photo.OpenReadAsync();
+
+                        // Save to temp path or stream (you can store stream directly if needed)
+                        var filePath = Path.Combine(FileSystem.CacheDirectory, photo.FileName);
+
+                        using (var fileStream = File.OpenWrite(filePath))
+                            await stream.CopyToAsync(fileStream);
+
+                        imagePathEntry.Text = filePath;
+                        recipeImage.Source = ImageSource.FromFile(filePath);
+                        recipeImage.Opacity = 1;
+                        previewPlaceholderLabel.IsVisible = false;
+                    }
+                }
+                else
+                {
+                    await MyCustomAlert.Show("Error", "Camera not supported on this device.", 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowDimBackground();
+                await MyCustomAlert.Show("Error", $"Camera failed: {ex.Message}", 0);
+                HideDimBackground();
             }
         }
         public void ShowDimBackground()
